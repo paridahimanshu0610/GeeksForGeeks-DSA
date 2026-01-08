@@ -9,18 +9,15 @@ from collections import deque
 class Solution:
     def findCeil(self,root, x):
         node = root
-        res = float('inf')
-        found = False
+        res = -1
         
         while node:
             if node.data==x:
                 return x
             elif node.data > x:
-                found = True
-                res = min(node.data, res)
+                res = node.data
                 node = node.left
             else:
                 node = node.right
         
-
-        return res if found else -1
+        return res
