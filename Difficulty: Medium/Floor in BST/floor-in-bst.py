@@ -7,18 +7,16 @@ class Node:
 '''
 class Solution:
     def findFloor(self, root, x):
-        res = float('-inf')
-        found = False
+        res = -1
         node = root
         
         while node:
             if node.data==x:
                 return x
             elif node.data < x:
-                found = True
-                res = max(res, node.data)
+                res = node.data
                 node = node.right
             else:
                 node = node.left
         
-        return res if found else -1
+        return res
