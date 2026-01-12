@@ -1,37 +1,43 @@
 class Solution:
-    def get_max_val(self, curr_idx, val, wt, curr_capacity, value_so_far):
-        if curr_idx==0:
-            if wt[0] <= curr_capacity:
-                value_so_far[0][curr_capacity] = val[0]
-                return value_so_far[0][curr_capacity]
+    def get_max(self, wt, val, W, curr_item, curr_wt, dp):
+        if curr_item == 0:
+            if curr_wt + wt[0] <= W:
+                dp[0][curr_wt] = val[0]
+                return dp[0][curr_wt]
             else:
-                return 0
+                dp[0][curr_wt] = 0
+                return dp[0][curr_wt]
         
-        if value_so_far[curr_idx][curr_capacity]!=-1:
-            return value_so_far[curr_idx][curr_capacity]
-            
-        not_pick = self.get_max_val(curr_idx-1,val, wt, curr_capacity, value_so_far)
-        pick = float('-inf')
-        if wt[curr_idx] <= curr_capacity:
-            pick = val[curr_idx] + self.get_max_val(curr_idx-1, val, wt, curr_capacity-wt[curr_idx], value_so_far)
+        if dp[curr_item][curr_wt]!=-1:
+            return dp[curr_item][curr_wt] 
         
-        value_so_far[curr_idx][curr_capacity] = max(not_pick, pick)
+        not_pick_value = self.get_max(wt, val, W, curr_item-1, curr_wt, dp)
         
-        return value_so_far[curr_idx][curr_capacity]
+        if curr_wt + wt[curr_item] <= W:
+            pick_value = val[curr_item] + self.get_max(wt, val, W, curr_item-1, curr_wt + wt[curr_item], dp)
+        else:
+            pick_value = not_pick_value
+        
+        dp[curr_item][curr_wt] = max(not_pick_value, pick_value)
+        
+        return dp[curr_item][curr_wt] 
         
     def knapsack(self, W, val, wt):
-        value_so_far = [[0]*(W+1) for i in range(len(val))]
-        # self.get_max_val(len(val)-1, val, wt, W, value_so_far)
-
-        for curr_capacity in range(W+1):
-            value_so_far[0][curr_capacity] = val[0] if wt[0] <= curr_capacity else 0
+        curr_item, curr_wt = len(val)-1, 0
+        dp = [0]*(W+1)
+        
+        for w in range(W+1):
+            dp[w] = val[0] if w + wt[0] <= W else 0
         
         for i in range(1, len(val)):
-            for curr_capacity in range(W+1):
-                not_pick = value_so_far[i-1][curr_capacity]
-                pick = float('-inf')
-                if wt[i] <= curr_capacity:
-                    pick = val[i] + value_so_far[i-1][curr_capacity-wt[i]]
-                value_so_far[i][curr_capacity] = max(pick, not_pick)
-                
-        return value_so_far[len(val)-1][W]
+            for w in range(W+1):
+                not_pick = dp[w]
+                if w+wt[i] <= W:
+                    pick = val[i] + dp[w+wt[i]]
+                else:
+                    pick = not_pick
+                    
+                dp[w] = max(pick, not_pick)
+        
+        # self.get_max(wt, val, W, curr_item, curr_wt, dp)
+        return dp[0] 
