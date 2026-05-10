@@ -1,5 +1,6 @@
-from collections import deque
-''' class Node:
+'''
+Definition for Node
+class Node:
     def __init__(self, val):
         self.right = None
         self.data = val
@@ -7,17 +8,14 @@ from collections import deque
 '''
         
 class Solution:
-    def findCeil(self,root, x):
-        node = root
-        res = -1
-        
-        while node:
-            if node.data==x:
-                return x
-            elif node.data > x:
-                res = node.data
-                node = node.left
-            else:
-                node = node.right
-        
-        return res
+    def findCeil(self, root, x):
+        if root is None:
+            return -1
+            
+        if root.data == x:
+            return root.data
+        elif root.data > x:
+            temp = self.findCeil(root.left, x)
+            return temp if temp > 0 else root.data
+        else:
+            return self.findCeil(root.right, x)
