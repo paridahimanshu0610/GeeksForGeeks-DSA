@@ -1,28 +1,27 @@
 class Solution:
-    def dfsTraverse(self, adj_list, vertex, components, visited):
-        if vertex in visited:
-            return components 
-        components.append(vertex)
-        visited.add(vertex)
+    def traverse(self, adj, node, curr, visited):
+        visited[node] = 1
+        curr.append(node)
         
-        for node in adj_list[vertex]:
-            if node not in visited: 
-                components = self.dfsTraverse(adj_list, node, components, visited)
-        return components
+        for e in adj[node]:
+            if not visited[e]:
+                self.traverse(adj, e, curr, visited)
+                
+        return curr
         
     def getComponents(self, v, edges):
-        adj_list = [[] for _ in range(v)]
-        
-        for e in edges:
-            adj_list[e[0]].append(e[1])
-            adj_list[e[1]].append(e[0])
-        
-        visited = set()
         res = []
+        visited = [0]*v
         
-        for vertex in range(v):
-            if vertex not in visited:
-                components = self.dfsTraverse(adj_list, vertex, [], visited)
-                res.append(components)
+        adj = [[] for _ in range(v)]
+        
+        for v1, v2 in edges:
+            adj[v1].append(v2)
+            adj[v2].append(v1)
             
+        for i in range(v):
+            if not visited[i]:
+                temp = self.traverse(adj, i, [], visited)
+                res.append(temp)
+                
         return res
