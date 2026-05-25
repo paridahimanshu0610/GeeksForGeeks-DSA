@@ -1,25 +1,29 @@
 class Solution:
-    def compute(self, a, day, last, dp):
-        if day == 0:
-            maxi = 0
+    def soFar(self, a, currDay, nextDayActivity, dp):
+        if currDay == 0:
+            
+            maxi = -float('inf')
             for i in range(3):
-                if i!=last:
-                    maxi = max(maxi, a[0][i])
-            dp[0][last] = maxi
+                if i != nextDayActivity:
+                    maxi = max(maxi, a[currDay][i])
+            dp[currDay][nextDayActivity] = maxi
+            
             return maxi
         
-        if dp[day][last] is not None:
-            return dp[day][last]
-            
-        maxi = 0
-        for i in range(3):
-            if i!=last:
-                maxi = max(maxi, self.compute(a, day-1, i, dp) + a[day][i])
+        if dp[currDay][nextDayActivity] is not None:
+            return dp[currDay][nextDayActivity]
         
-        dp[day][last] = maxi
+        maxi = -float('inf')
+        for i in range(3):
+            if i != nextDayActivity:
+                maxi = max(maxi, a[currDay][i] + self.soFar(a, currDay-1, i, dp))
+        
+        dp[currDay][nextDayActivity] = maxi
+        
         return maxi
             
     def maximumPoints(self, a):
-        dp = [[None]*4 for _ in range(len(a))]
+        n = len(a)
+        dp = [[None]*4 for _ in range(n)]
         
-        return self.compute(a, len(a)-1, 3, dp)
+        return self.soFar(a, n-1, 3, dp)
