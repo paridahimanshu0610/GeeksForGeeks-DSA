@@ -1,26 +1,28 @@
 class Solution:
-    def check(self, a, target, idx, dp):
+    def soFar(self, a, idx, target, dp):
         if target == 0:
-            return True
+            dp[idx][target-1] = True
+            return dp[idx][target-1]
 
         if idx == 0:
-            dp[target - 1][idx] = (target == a[idx])
-            return dp[target - 1][idx]
+            dp[idx][target-1] = (a[idx] == target)
+            return dp[idx][target-1]
 
-        if dp[target - 1][idx] is not None:
-            return dp[target - 1][idx]
+        if dp[idx][target-1] is not None:
+            return dp[idx][target-1]
 
+        notTake = self.soFar(a, idx-1, target, dp)
         take = False
+
         if target >= a[idx]:
-            take = self.check(a, target - a[idx], idx - 1, dp)
+            take = self.soFar(a, idx-1, target-a[idx], dp)
 
-        not_take = self.check(a, target, idx - 1, dp)
+        dp[idx][target-1] = (take or notTake)
 
-        dp[target - 1][idx] = take or not_take
+        return dp[idx][target-1]
 
-        return dp[target - 1][idx]
+    def isSubsetSum (self, a, target):
+        n = len(a)
+        dp = [[None]*target for _ in range(n)]
 
-    def isSubsetSum(self, a, target):
-        dp = [[None] * len(a) for _ in range(target)]
-
-        return self.check(a, target, len(a) - 1, dp)
+        return self.soFar(a, n-1, target, dp)
