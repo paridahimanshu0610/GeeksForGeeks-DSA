@@ -1,69 +1,59 @@
 class Solution:
-    def soFar(self, a, idx, target, dp):
+    def soFar(self, a, idx, k, dp):
         if idx == 0:
-            if a[idx] == 0 and target == 0:
-                dp[idx][target] = 2
-            elif target == 0:
-                dp[idx][target] = 1
-            elif a[idx] == target:
-                dp[idx][target] = 1
+            if k == 0:
+                return 2 if a[idx] == 0 else 1
             else:
-                dp[idx][target] = 0
-            
-            return dp[idx][target]
-
-        if target == 0:
-            if a[idx] == 0:
-                dp[idx][target] = 2
-            else:
-                dp[idx][target] = 1
+                return 1 if a[idx] == k else 0
                 
-            return dp[idx][target]
+        if (idx, k) in dp:
+            return dp[(idx, k)]
             
-        if dp[idx][target] is not None:
-            return dp[idx][target]
+        take = self.soFar(a, idx-1, k - a[idx], dp)
+        notTake = self.soFar(a, idx-1, k, dp)
         
-        take = 0
-        if a[idx] <= target:
-            take = self.soFar(a, idx-1, target-a[idx], dp)
-        notTake = self.soFar(a, idx-1, target, dp)
+        dp[(idx, k)] = take + notTake
         
-        dp[idx][target] = (take + notTake)
-        
-        return dp[idx][target]
+        return dp[(idx, k)]
         
     def countPartitions(self, a, diff):
-        total = sum(a)
-        target = total // 2
         n = len(a)
+        dp = {}
+        minSum, maxSum, total = 0, 0, 0
         
-        dp = [0]*(target+1)
-        
-        # Target == 0
-        dp[0] = 2 if a[0] == 0 else 1 
-        
-        # Target > 0
-        if target > 0 and a[0] > 0 and a[0] <= target:
-            dp[a[0]] = 1
-        
-        for idx in range(1, n):
-            temp = [None]*(target+1)
-            for k in range(target+1):
-                take = 0
-                if a[idx] <= k:
-                    take = dp[k-a[idx]]
-                notTake = dp[k]
-                temp[k] = (take + notTake)
+        for e in a:
+            total += e
+            if e > 0:
+                maxSum += e
+            else:
+                minSum += e
                 
+        dp = [0]*(maxSum-minSum+1)
+        
+        for k in range(minSum, maxSum+1):
+            new_point = k - minSum
+            if k == 0:
+                dp[new_point] = 2 if a[0] == 0 else 1
+            else:
+                dp[new_point] = 1 if a[0] == k else 0
+                
+        for idx in range(1, n):
+            temp = [0]*(maxSum-minSum+1)
+            for k in range(minSum, maxSum+1):
+                # Take
+                take = dp[k-a[idx]-minSum] if 0 <= k-a[idx]-minSum < maxSum-minSum+1 else 0
+                
+                # Not take
+                notTake = dp[k - minSum]
+                
+                temp[k - minSum] = take + notTake
             dp = temp
         
         # print(dp)
+        res = 0
+        for k in range(minSum, (minSum+maxSum)//2 + 1):
+            new_point = k - minSum
+            if dp[k] > 0 and abs(total - 2*k) == diff:
+                res += dp[k]
         
-        cnt = 0        
-        for k in range(target+1):
-            if dp[k]:
-                subset1, subset2 = k, total-k
-                if abs(subset1-subset2) == diff:
-                    cnt += dp[k]
-                    
-        return cnt
+        return res
