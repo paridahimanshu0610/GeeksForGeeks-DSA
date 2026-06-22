@@ -48,7 +48,7 @@ class Solution:
                         pos = mid
                         break
                 dp[pos] = a[i]
-                j = j+1 if pos == j else j
+                j = pos+1 if pos == j else j
                 
                 # print(i, a[i], dp)
          
