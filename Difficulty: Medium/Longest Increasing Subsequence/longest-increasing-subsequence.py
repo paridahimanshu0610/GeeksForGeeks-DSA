@@ -1,57 +1,55 @@
 class Solution:
-    def upNext(self, a, idx, prev_idx, dp):
-        if idx == len(a):
-            if (prev_idx==0) or (a[idx] > a[prev_idx-1]):
-                dp[len(a)-1][prev_idx] = 1
+    def upNext(self, a, curr_idx, prev_idx, dp):
+        if curr_idx == len(a)-1:
+            if (prev_idx==0) or (a[curr_idx] > a[prev_idx-1]):
+                dp[curr_idx][prev_idx] = 1
             else:
-                dp[len(a)-1][prev_idx] = 0
+                dp[curr_idx][prev_idx] = 0
+
+            return dp[curr_idx][prev_idx]
+
+        if dp[curr_idx][prev_idx] is not None:
+            return dp[curr_idx][prev_idx]
+
+        notPick = self.upNext(a, curr_idx+1, prev_idx, dp)
+        
+        pick = 0
+        if (prev_idx==0) or (a[curr_idx] > a[prev_idx-1]):
+            pick = 1 + self.upNext(a, curr_idx + 1, curr_idx+1, dp)
+
+        dp[curr_idx][prev_idx] = max(pick, notPick)
+
+        return dp[curr_idx][prev_idx]
+    
+    def get_pos_to_replace(self, temp, x):
+        n = len(temp)
+        l, h = 0, n-1
+        
+        while l <= h:
+            mid = (l+h)//2
+            if temp[mid] == x:
+                return mid
+            elif x > temp[mid]:
+                l = mid+1
+            else:
+                h = mid-1
             
-            return dp[len(a)-1][prev_idx]
-        
-        if dp[idx][prev_idx]:
-            return dp[idx][prev_idx]
-        
-        notTake = self.upNext(a, idx+1, prev_idx, dp)
-        
-        take = 0
-        if (prev_idx==0) or (a[idx] > a[prev_idx-1]):
-            take = 1 + self.upNext(a, idx+1, idx+1, dp)
-        
-        dp[idx][prev_idx] = max(take, notTake)
-        
-        return dp[idx][prev_idx]
+        return l
         
     def lis(self, a):
         n = len(a)
-        dp = [None]*(n)
-        res = 1
-        j = 0
-        
-        dp[j] = a[0]
-        j += 1
+        temp = [a[0]]
         
         for i in range(1, n):
-            if a[i] > dp[j-1]:
-                dp[j] = a[i]
-                j += 1
+            if a[i] > temp[-1]:
+                temp.append(a[i])
             else:
-                l, h = 0, j-1
-                pos = j
-                while l <= h:
-                    mid = l + (h-l)//2
-                    if a[i] > dp[mid]:
-                        l = mid+1
-                    elif a[i] < dp[mid]:
-                        pos = min(mid, pos)
-                        h = mid-1
-                    else:
-                        pos = mid
-                        break
-                dp[pos] = a[i]
-                j = pos+1 if pos == j else j
-                
-                # print(i, a[i], dp)
-         
-        # print(dp)
-        
-        return j
+                # print(i, a[i], temp, sep = " | ")
+                pos = self.get_pos_to_replace(temp, a[i])
+                # print(pos)
+                if pos < len(temp):
+                    temp[pos] = a[i]
+                else:
+                    temp.append(a[i])
+            
+        return len(temp)
