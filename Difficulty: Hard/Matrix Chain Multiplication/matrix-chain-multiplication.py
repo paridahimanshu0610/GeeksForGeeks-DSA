@@ -25,6 +25,18 @@ class Solution:
         
     def matrixMultiplication(self, a):
         n = len(a)
-        dp = [[None]*n for _ in range(n)]
+        dp = [[0]*n for _ in range(n)]
         
-        return self.currBlock(a, 1, n-1, dp)
+        for length in range(2, n):
+            for l in range(1, n - length + 1):
+                h = l + length - 1
+                
+                mini = float('inf')
+                for i in range(l, h):
+                    partition = dp[l][i] + dp[i+1][h]
+                    curr_prod = a[l-1] * a[i] * a[h]
+                    mini = min(mini, curr_prod + partition)
+                    
+                dp[l][h] = mini
+        
+        return dp[1][n-1]
