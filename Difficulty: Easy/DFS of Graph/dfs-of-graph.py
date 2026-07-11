@@ -1,16 +1,17 @@
 class Solution:
-    def traverse(self, node, adj, visited, res):
-        res.append(node)
-        visited.add(node)
+    def dfsTraverse(self, a, idx, visited, res):
+        res.append(idx)
+        visited[idx] = 1
         
-        for e in adj[node]:
-            if e not in visited:
-                self.traverse(e, adj, visited, res)
-            
-    def dfs(self, adj):
-        visited = set()
+        for e in a[idx]:
+            if not visited[e]:
+                self.dfsTraverse(a, e, visited, res)
+        
+    def dfs(self, a):
         res = []
-        self.traverse(0, adj, visited, res)
+        visited = [0]*len(a)
+        idx = 0
         
-        return res 
+        self.dfsTraverse(a, idx, visited, res)
         
+        return res
