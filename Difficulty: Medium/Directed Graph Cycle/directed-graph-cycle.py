@@ -1,28 +1,29 @@
 class Solution:
-    def dfs(self, adj, node, visited):
-        visited[node] = 1
+    def dfsTraverse(self, a, v, visited):
+        visited[v] = 1
         
-        for e in adj[node]:
-            if not visited[e]:
-                if self.dfs(adj, e, visited):
+        for nv in a[v]:
+            if not visited[nv]:
+                if self.dfsTraverse(a, nv, visited):
                     return True
-            elif visited[e] == 1:
+            elif visited[nv] == 1:
                 return True
                 
-        visited[node] = 2
+        visited[v] = 2
         
         return False
         
-    def isCyclic(self, v, edges):
-        visited = [0]*v
-        adj = [[] for _ in range(v)]
+    def isCyclic(self, V, edges):
+        a = [[] for _ in range(V)]
         
-        for v1, v2 in edges:
-            adj[v1].append(v2)
+        for u, v in edges:
+            a[u].append(v)
             
-        for e in range(v):
-            if not visited[e]:
-                if self.dfs(adj, e, visited):
-                    return True
-                    
+        visited = [0]*V
+        
+        
+        for v in range(V):
+            if self.dfsTraverse(a, v, visited):
+                return True
+                
         return False
