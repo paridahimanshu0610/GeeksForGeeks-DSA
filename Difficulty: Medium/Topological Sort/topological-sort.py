@@ -1,24 +1,31 @@
 class Solution:
-    def dfs(self, adj, node, stack, visited):
-        visited[node] = 1
+    def topoSort(self, V, edges):
+        a = [[] for _ in range(V)]
         
-        for e in adj[node]:
-            if not visited[e]:
-                self.dfs(adj, e, stack, visited)
-                
-        stack.append(node)
+        for u, v in edges:
+            a[u].append(v)
         
-    def topoSort(self, v, edges):
-        visited = [0]*v
-        adj = [[] for _ in range(v)]
+        res = []
+        visited = [0]*V
         
-        for v1, v2 in edges:
-            adj[v1].append(v2)
+        def dfs(node):
+            visited[node] = 1
+            
+            for idx in a[node]:
+                if not visited[idx]:
+                    if not dfs(idx):
+                        return False
+                elif visited[idx] == 1:
+                    return False
+            
+            visited[node] = 2
+            res.append(node)
+            
+            return True
         
-        stack = []
+        for v in range(V):
+            if not visited[v]:
+                if not dfs(v):
+                    return []
         
-        for e in range(v):
-            if not visited[e]:
-                self.dfs(adj, e, stack, visited)
-        
-        return stack[::-1]
+        return res[::-1]
