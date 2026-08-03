@@ -26,14 +26,17 @@ class Solution:
         while l <= h:
             mid = (l+h)//2
             total_lhs = 0
-            rhs_min = float("inf")
             
             for i in range(m):
-                curr_lhs = self.findPos(a[i], mid) # Number of elements on the lhs of mid in a[i]
-                total_lhs += curr_lhs 
-                curr_rhs_min = a[i][curr_lhs] if curr_lhs < n else float("inf")
-                rhs_min = min(rhs_min, curr_rhs_min)
-            
+                # Number of elements strictly less than mid in a[i]
+                curr_lhs = self.findPos(a[i], mid)
+                total_lhs += curr_lhs
+                
+            # Consider the list: [1, 3, 5, 17, 25, 29, 33]
+            # Now, total_lhs == lhs in 2 scenarios:
+            # (mid == 17) or (5 < mid < 17)
+            # In the 2nd scenario, we need to move mid towards 17 and so, we should move right by taking l = mid+1.
+            # We need to move mid towards 17 because median must be an element from the list (i.e. flattened matrix)
             if total_lhs <= lhs:
                 l = mid+1
             else:
