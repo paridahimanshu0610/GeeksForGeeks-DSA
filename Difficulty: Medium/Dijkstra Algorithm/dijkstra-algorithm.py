@@ -1,30 +1,30 @@
-import heapq as hq
+import heapq
 
 class Solution:
-    def dijkstra(self, v, edges, src):
-        adj = [[] for _ in range(v)]
+    def dijkstra(self, V: int, edges: list[list[int]], src: int) -> list[int]:
+        adj = [[] for _ in range(V)]
         
-        for v1, v2, d in edges:
-            adj[v1].append((v2, d))
-            adj[v2].append((v1, d))  # reverse edge for undirected graph
-        
-        dist = [float('inf')] * v
+        for v1, v2, wt in edges:
+            adj[v1].append((v2, wt))
+            adj[v2].append((v1, wt))
+            
+        dist = [float("inf")]*V
         dist[src] = 0
+
+        mindist = []
+        heapq.heappush(mindist, (0, src))
         
-        visited = [0]*v
-        dist_heap = []
-        hq.heappush(dist_heap, (0, src))
-        
-        while len(dist_heap) != 0:
-            curr_d, curr_node = hq.heappop(dist_heap)
+        visited = [0]*V
+        while len(mindist)!=0:
+            currDist, node = heapq.heappop(mindist)
             
-            if visited[curr_node]:
+            if visited[node]:
                 continue
-            visited[curr_node] = 1
+            visited[node] = 1
             
-            for node, d in adj[curr_node]:
-                if dist[node] > (curr_d + d):
-                    dist[node] = curr_d + d
-                    hq.heappush(dist_heap, (dist[node], node))
-                    
+            for nv, wt in adj[node]:
+                if (currDist + wt) < dist[nv]:
+                    dist[nv] = currDist + wt
+                    heapq.heappush(mindist, (dist[nv], nv))
+                        
         return dist
