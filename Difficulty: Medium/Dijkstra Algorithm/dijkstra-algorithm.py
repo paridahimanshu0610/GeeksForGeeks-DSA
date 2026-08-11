@@ -4,27 +4,26 @@ class Solution:
     def dijkstra(self, V: int, edges: list[list[int]], src: int) -> list[int]:
         adj = [[] for _ in range(V)]
         
-        for v1, v2, wt in edges:
-            adj[v1].append((v2, wt))
-            adj[v2].append((v1, wt))
+        for u,v,wt in edges:
+            adj[u].append((v,wt))
+            adj[v].append((u,wt))
             
-        dist = [float("inf")]*V
-        dist[src] = 0
-
-        mindist = []
-        heapq.heappush(mindist, (0, src))
-        
+        minHeap = []
         visited = [0]*V
-        while len(mindist)!=0:
-            currDist, node = heapq.heappop(mindist)
-            
+        res = [float('inf')]*V
+        
+        res[src] = 0
+        heapq.heappush(minHeap, (0, src))
+        
+        while len(minHeap) != 0:
+            dist, node = heapq.heappop(minHeap)
             if visited[node]:
                 continue
             visited[node] = 1
-            
-            for nv, wt in adj[node]:
-                if (currDist + wt) < dist[nv]:
-                    dist[nv] = currDist + wt
-                    heapq.heappush(mindist, (dist[nv], nv))
-                        
-        return dist
+             
+            for nv,wt in adj[node]:
+                if dist+wt < res[nv]:
+                    res[nv] = dist+wt
+                    heapq.heappush(minHeap, (dist+wt, nv))
+                    
+        return res
