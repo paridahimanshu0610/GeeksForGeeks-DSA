@@ -4,55 +4,52 @@ class Solution:
     def shortestPath(self, V, edges, src, dest):
         adj = [[] for _ in range(V)]
         
-        for v1, v2, wt in edges:
-            adj[v1-1].append((wt, v2-1))
-            adj[v2-1].append((wt, v1-1))
+        for u,v,wt in edges:
+            adj[v-1].append((u-1,wt))
+            adj[u-1].append((v-1,wt))
             
-        dist = [float("inf")]*V
-        dist[src-1] = 0
         track = [None]*V
-        
+        minDist = [float('inf')]*V
         minHeap = []
+        res = []
+        
         heapq.heappush(minHeap, (0, src-1))
+        minDist[src-1] = 0
         
-        
-        def construct_path(node):
-            resPath = []
+        def constructPath(currNode):
+            tempPath = []
             
-            while node is not None:
-                resPath.append(node+1)
-                node = track[node]
+            while currNode is not None:
+                tempPath.append(currNode)
+                currNode = track[currNode]
                 
-            return resPath[::-1]
-                
+            return tempPath[::-1]
+        
         while len(minHeap) != 0:
-            currDist, node = heapq.heappop(minHeap)
+            dist, node = heapq.heappop(minHeap)
             
-            if currDist > dist[node]:
+            if dist > minDist[node]:
                 continue
             
-            for wt, nv in adj[node]:
-                if (currDist+wt) < dist[nv]:
-                    dist[nv] = currDist+wt
+            for nv,wt in adj[node]:
+                if dist+wt < minDist[nv]:
+                    minDist[nv] = dist+wt
+                    heapq.heappush(minHeap, (dist+wt, nv))
                     track[nv] = node
-                    heapq.heappush(minHeap, (currDist+wt, nv))
-                elif (currDist+wt) == dist[nv]:
-                    candidate_path = construct_path(node) + [nv+1]
-                    current_path = construct_path(track[nv]) + [nv+1]
+                elif dist+wt == minDist[nv]:
+                    currentPath = constructPath(nv)
+                    candidatePath = constructPath(node)+[nv]
                     
-                    if candidate_path < current_path:
+                    if candidatePath < currentPath:  
+                        heapq.heappush(minHeap, (dist+wt, nv))
                         track[nv] = node
-                        heapq.heappush(minHeap, (currDist+wt, nv))
-                    
-        res = []
-        currNode = dest-1
         
+        if track[dest-1] is None and dest!=src:
+            return [-1]
+        
+        currNode = dest-1
         while currNode is not None:
             res.append(currNode+1)
             currNode = track[currNode]
             
-        if dist[dest-1] == float("inf"):
-            return [-1]
-        else:
-            return res[::-1]
-            
+        return res[::-1]
